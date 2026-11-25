@@ -3,8 +3,11 @@ package tn.esprit.autoloc.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.autoloc.domain.Maintenance;
+import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.repository.IMaintenanceRepository;
+import tn.esprit.autoloc.repository.IVehiculeRepository;
 
 import java.util.List;
 
@@ -13,9 +16,19 @@ import java.util.List;
 public class MaintenanceServiceImpl implements IMaintenanceService {
 
     private final IMaintenanceRepository maintenanceRepository;
+    private final IVehiculeRepository vehiculeRepository;
 
     @Override
+    @Transactional
     public Maintenance addMaintenance(Maintenance maintenance) {
+        // cascade = PERSIST : le véhicule doit être une entité gérée (chargée en base), pas un objet détaché
+        if (maintenance.getVehicule() == null || maintenance.getVehicule().getIdVehicule() == null) {
+            throw new IllegalArgumentException("Le véhicule de la maintenance est obligatoire");
+        }
+        Long idVehicule = maintenance.getVehicule().getIdVehicule();
+        Vehicule vehicule = vehiculeRepository.findById(idVehicule)
+                .orElseThrow(() -> new EntityNotFoundException("Vehicule introuvable : id=" + idVehicule));
+        maintenance.setVehicule(vehicule);
         return maintenanceRepository.save(maintenance);
     }
 

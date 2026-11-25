@@ -1,5 +1,7 @@
 package tn.esprit.autoloc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -45,6 +47,7 @@ public class Vehicule {
     private StatutVehicule statut;
 
     // N Vehicule -> 1 Agence (côté propriétaire : clé étrangère id_agence)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_agence", nullable = false)
     private Agence agence;
@@ -58,6 +61,7 @@ public class Vehicule {
     private Set<Equipement> equipements = new HashSet<>();
 
     // 1 Vehicule -> N Reservation
+    @JsonIgnore
     @OneToMany(mappedBy = "vehicule", fetch = FetchType.LAZY)
     private List<Reservation> reservations = new ArrayList<>();
 }

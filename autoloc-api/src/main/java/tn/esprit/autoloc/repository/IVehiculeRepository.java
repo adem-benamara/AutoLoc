@@ -7,4 +7,3 @@ import tn.esprit.autoloc.domain.Vehicule;
 @Repository
 public interface IVehiculeRepository extends JpaRepository<Vehicule, Long> {
 }
-=
